@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 from csv_detective.explore_csv import routine
 from joblib import Parallel, delayed
 import pickle
@@ -22,7 +24,7 @@ def run_csv_detective(file_path):
         return inspection_results
 
 
-def get_detective_analysis(begin_from=None, n_datasets=None, n_jobs=2):
+def get_csv_detective_analysis(begin_from=None, n_datasets=None, n_jobs=2):
     list_files = get_files("./data/unpop_datasets")
     if n_datasets:
         list_files = list_files[:n_datasets]
@@ -34,7 +36,7 @@ def get_detective_analysis(begin_from=None, n_datasets=None, n_jobs=2):
 
     run_csv_detective_p = partial(run_csv_detective)
     list_dict_result = Parallel(n_jobs=n_jobs)(delayed(run_csv_detective_p)(file_path) for file_path in tqdm(list_files))
-    pickle.dump(list_dict_result, open("list_csvdetective_results.pkl", "wb"))
+    pickle.dump(list_dict_result, open("list_csv_detective_results.pkl", "wb"))
 
 
 def try_detective(begin_from=None):
@@ -58,7 +60,24 @@ def try_detective(begin_from=None):
             print(file_path, inspection_results)
 
 
+def analyze_detected_csvs():
+    list_csv_detective = pickle.load(open("list_csvdetective_results.pkl", "rb"))
+    list_csv_detective = [l for l in list_csv_detective if l]
+    dict_column_dataset = defaultdict(list)
+    for l in list_csv_detective:
+        for k, v in l["columns"].items():
+            if "       " in k:
+                continue
+            for v2 in v:
+                dict_column_dataset[v2].append((l["file"], k))
+
+    pickle.dump(dict_column_dataset, open("dict_column_dataset.pkl", "wb"))
+
+
+
 
 if __name__ == '__main__':
     # try_detective(begin_from="DM1_2018_EHPAD")
-    get_detective_analysis(n_datasets=None, n_jobs=8)
+    # get_csv_detective_analysis(n_datasets=None, n_jobs=8)
+    analyze_detected_csvs()
+    pass
