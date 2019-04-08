@@ -12,10 +12,10 @@ def downloader(url, id):
 def main():
     df = pds.read_csv("all_datagouv_csv.csv")
 
-    urls = df.url.values[:1000]
-    ids = df._id.values[:1000]
+    urls = df.url.values[:]
+    ids = df._id.values[:]
     assert(len(urls) == len(ids))
-    Parallel(n_jobs=1)(
+    Parallel(n_jobs=18)(
         delayed(downloader)(url,id) for url,id in zip(urls, ids))
 
 if __name__ == '__main__':
