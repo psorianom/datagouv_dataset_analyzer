@@ -49,8 +49,10 @@ def build_dataframes(list_dict_results):
     # for res in list_dict_results:
     #     uniq_csv_detective_cols.update(res.keys())
     # print(uniq_csv_detective_cols)
-    list_dicts_df_csv = []
-    
+    list_dict = []
+    for dicto in list_dict_results:
+        typed_columns = dicto.pop("columns")
+        list_dict.append(dicto)
 
     pass
 
