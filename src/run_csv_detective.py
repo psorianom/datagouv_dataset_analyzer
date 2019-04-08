@@ -15,6 +15,7 @@ import pickle
 from functools import partial
 from tqdm import tqdm
 import logging
+
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
@@ -22,7 +23,6 @@ from utils import get_files
 
 
 def run_csv_detective(file_path):
-
     logger.info("Treating file {}".format(file_path))
     try:
         inspection_results = routine(file_path)
@@ -44,8 +44,13 @@ def build_dataframes(list_dict_results):
     :param list_dict_results:
     :return:
     """
-    uniq_csv_detective_cols = []
 
+    # uniq_csv_detective_cols = set([])
+    # for res in list_dict_results:
+    #     uniq_csv_detective_cols.update(res.keys())
+    # print(uniq_csv_detective_cols)
+    list_dicts_df_csv = []
+    
 
     pass
 
@@ -69,7 +74,6 @@ def get_csv_detective_analysis_single(files_path="./data/unpop_datasets", begin_
     pickle.dump(list_dict_result, open("list_csv_detective_results.pkl", "wb"))
 
 
-
 def get_csv_detective_analysis(files_path="./data/unpop_datasets", begin_from=None, n_datasets=None, n_jobs=2):
     list_files = get_files(files_path)
     if n_datasets:
@@ -81,7 +85,8 @@ def get_csv_detective_analysis(files_path="./data/unpop_datasets", begin_from=No
             list_files = list_files[indx_begin[0]:]
 
     run_csv_detective_p = partial(run_csv_detective)
-    list_dict_result = Parallel(n_jobs=n_jobs)(delayed(run_csv_detective_p)(file_path) for file_path in tqdm(list_files))
+    list_dict_result = Parallel(n_jobs=n_jobs)(
+        delayed(run_csv_detective_p)(file_path) for file_path in tqdm(list_files))
     list_dict_result = [d for d in list_dict_result if d]
     pickle.dump(list_dict_result, open("list_csv_detective_results.pkl", "wb"))
 
@@ -121,18 +126,16 @@ def analyze_detected_csvs():
     pickle.dump(dict_column_dataset, open("dict_column_dataset.pkl", "wb"))
 
 
-
-
 if __name__ == '__main__':
     # try_detective(begin_from="DM1_2018_EHPAD")
     parser = argopt(__doc__).parse_args()
     files_path = parser.i
     n_cores = int(parser.cores)
 
-    if n_cores > 1:
-        get_csv_detective_analysis(files_path, begin_from=None, n_datasets=None, n_jobs=n_cores)
-    else:
-        get_csv_detective_analysis_single(files_path, begin_from=None, n_datasets=None)
+    # if n_cores > 1:
+    #     get_csv_detective_analysis(files_path, begin_from=None, n_datasets=None, n_jobs=n_cores)
+    # else:
+    #     get_csv_detective_analysis_single(files_path, begin_from=None, n_datasets=None)
 
-    # analyze_detected_csvs()
+    build_dataframes(pickle.load(open("list_csv_detective_results.pkl", "rb")))
     pass
