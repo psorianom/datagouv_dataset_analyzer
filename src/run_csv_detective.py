@@ -1,37 +1,29 @@
-'''Example programme description.
+'''Transforms XML files into format CoNLL (one token per line)
 
 Usage:
-    run_csv_detective.py <x> [<y>...]
+    run_csv_detective.py <i> [options]
 
 Arguments:
-    <x>                   The path where the CSVs are stored.
-    --anarg=<a>           int, Description here [default: 1e3].
-    -p PAT, --patts PAT   file, Or (default: None).
-    --bar=<b>             str, Another [default: something] should
-                          assume str like everything else.
-    -f, --force           Force.
-    -h, --help            Show this help message and exit.
-    -v, --version         Show program's version number and exit.
-
+    <i>                   An input file or directory (if dir it will convert all txt files inside).
+    --cores=<n> CORES                  Number of cores to use [default: 2]
 '''
-
 from collections import defaultdict
-from docopt import docopt
+from argopt import argopt
 from csv_detective.explore_csv import routine
 from joblib import Parallel, delayed
 import pickle
 from functools import partial
 from tqdm import tqdm
 import logging
-logger=logging.getLogger()
-logger.setLevel(logging.DEBUG)
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 from utils import get_files
 
 
 def run_csv_detective(file_path):
 
-    logger.info(file_path)
+    logger.info("Treating file {}".format(file_path))
     try:
         inspection_results = routine(file_path)
     except Exception as e:
@@ -40,8 +32,42 @@ def run_csv_detective(file_path):
 
     if len(inspection_results) > 2 and len(inspection_results["columns"]):
         inspection_results["file"] = file_path
-        print(file_path, inspection_results["columns"])
+        print(file_path, inspection_results)
         return inspection_results
+    else:
+        logger.info("Analysis output of file {} was empty".format(files_path))
+
+
+def build_dataframes(list_dict_results):
+    """
+    Builds two dataframes from a list of csv_detective results
+    :param list_dict_results:
+    :return:
+    """
+    uniq_csv_detective_cols = []
+
+
+    pass
+
+
+def get_csv_detective_analysis_single(files_path="./data/unpop_datasets", begin_from=None, n_datasets=None):
+    list_files = get_files(files_path)
+    if n_datasets:
+        list_files = list_files[:n_datasets]
+
+    if begin_from:
+        indx_begin = [i for i, path in enumerate(list_files) if begin_from in path]
+        if indx_begin:
+            list_files = list_files[indx_begin[0]:]
+
+    list_dict_result = []
+    for f in tqdm(list_files):
+        output_csv_detective = run_csv_detective(f)
+        list_dict_result.append(output_csv_detective)
+
+    list_dict_result = [d for d in list_dict_result if d]
+    pickle.dump(list_dict_result, open("list_csv_detective_results.pkl", "wb"))
+
 
 
 def get_csv_detective_analysis(files_path="./data/unpop_datasets", begin_from=None, n_datasets=None, n_jobs=2):
@@ -99,9 +125,14 @@ def analyze_detected_csvs():
 
 if __name__ == '__main__':
     # try_detective(begin_from="DM1_2018_EHPAD")
-    args = docopt(__doc__)
-    files_path = args["<x>"]
+    parser = argopt(__doc__).parse_args()
+    files_path = parser.i
+    n_cores = int(parser.cores)
 
-    get_csv_detective_analysis(files_path, begin_from=None, n_datasets=None, n_jobs=1)
+    if n_cores > 1:
+        get_csv_detective_analysis(files_path, begin_from=None, n_datasets=None, n_jobs=n_cores)
+    else:
+        get_csv_detective_analysis_single(files_path, begin_from=None, n_datasets=None)
+
     # analyze_detected_csvs()
     pass
