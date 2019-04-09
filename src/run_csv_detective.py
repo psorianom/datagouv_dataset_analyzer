@@ -134,10 +134,10 @@ if __name__ == '__main__':
     files_path = parser.i
     n_cores = int(parser.cores)
 
-    # if n_cores > 1:
-    #     get_csv_detective_analysis(files_path, begin_from=None, n_datasets=None, n_jobs=n_cores)
-    # else:
-    #     get_csv_detective_analysis_single(files_path, begin_from=None, n_datasets=None)
+    if n_cores > 1:
+        get_csv_detective_analysis(files_path, begin_from=None, n_datasets=None, n_jobs=n_cores)
+    else:
+        get_csv_detective_analysis_single(files_path, begin_from=None, n_datasets=None)
 
     build_dataframes(pickle.load(open("list_csv_detective_results.pkl", "rb")))
     pass
