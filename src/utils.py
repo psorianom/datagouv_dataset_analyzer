@@ -9,5 +9,5 @@ def stringio2file(stringio, file_path):
 
 
 def get_files(data_path, ext="csv"):
-    return glob.glob(data_path + "/*/" + "*.{}".format(ext))
+    return glob.glob(data_path + "/*.{}".format(ext))
 
