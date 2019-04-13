@@ -19,9 +19,19 @@ from argopt import argopt
 from joblib import Parallel, delayed
 
 
+def is_compressed(url):
+    splitted_url = url.split(".")
+    for ext in ["zip", "gz"]:
+        if ext in splitted_url[-1]:
+            return ext
+
 def downloader(url, id, output_folder):
 
-    p = subprocess.Popen(["wget", "-O", "{0}/{1}.csv".format(output_folder, id), url])
+    extension = is_compressed(url)
+    if not extension:
+        extension = "csv"
+
+    p = subprocess.Popen(["wget", "-O", "{0}/{1}.{2}".format(output_folder, id, extension), url])
     p.communicate()  # now wait plus that you can send commands to process
 
 
