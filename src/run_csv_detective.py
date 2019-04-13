@@ -143,6 +143,6 @@ if __name__ == '__main__':
 
     pickle.dump(type_dict_csv, open(os.path.join(output_path, "csv_detective_column_type.pkl"), "wb"))
 
-    csv_detective_df.to_csv(os.path.join(output_path, "csv_detective_attributes.csv"))
+    csv_detective_df.to_csv(os.path.join(output_path, "csv_detective_attributes.tsv"), sep="\t")
 
     pass
