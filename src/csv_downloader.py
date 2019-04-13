@@ -21,7 +21,7 @@ from joblib import Parallel, delayed
 
 def downloader(url, id, output_folder):
 
-    p = subprocess.Popen(["wget", "-O", "{0}/{1}.csv".format(output_folder, idl), url])
+    p = subprocess.Popen(["wget", "-O", "{0}/{1}.csv".format(output_folder, id), url])
     p.communicate()  # now wait plus that you can send commands to process
 
 
