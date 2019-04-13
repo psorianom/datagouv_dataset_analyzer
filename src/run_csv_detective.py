@@ -21,6 +21,7 @@ import logging
 import pandas as pd
 
 logger = logging.getLogger()
+logger.addHandler(logging.StreamHandler())
 logger.setLevel(logging.INFO)
 
 from utils import get_files
