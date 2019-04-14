@@ -20,6 +20,8 @@ from tqdm import tqdm
 import logging
 import pandas as pd
 
+from src.utils import get_id
+
 logger = logging.getLogger()
 logger.addHandler(logging.StreamHandler())
 logger.setLevel(logging.INFO)
@@ -101,10 +103,6 @@ def get_csv_detective_analysis(files_path="./data/unpop_datasets", begin_from=No
         delayed(run_csv_detective_p)(file_path) for file_path in tqdm(list_files))
     list_dict_result = [d for d in list_dict_result if d]
     return list_dict_result
-
-
-def get_id(file_name):
-    return os.path.basename(file_name)[:-4]
 
 
 def build_type_dict(list_dict_results):
