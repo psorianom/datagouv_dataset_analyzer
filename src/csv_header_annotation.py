@@ -9,6 +9,7 @@ Arguments:
     <i>                     An input folder with CSVs to analyze
     --detective DETECT      A tsv file path with the info recovered from previously running csv_detective over the input CSVs folder
     --columns COLS          A pickle file with a dict of csv_detective types as keys and a list of corresponding datasets as values
+    --excel                 Make an Excel file output instead of a CSV (drop down menu coolness)
     --cores CORES           The number of cores to use in a parallel setting [default:2:int]
 '''
 import pickle
@@ -131,13 +132,19 @@ if __name__ == '__main__':
     else:
         detective_df = None
 
+    with_excel = parser.excel
+
     n_jobs = int(parser.cores)
 
-    files = get_files(files_path)[:2]
+    files = get_files(files_path)
 
     if n_jobs == 1:
-        listo = header_analysis_single(files, detective_df=detective_df, datasets_types_dict=datasets_types_dict)
+        list_dfs = header_analysis_single(files, detective_df=detective_df, datasets_types_dict=datasets_types_dict)
     else:
-        header_analysis(files, n_jobs=n_jobs, detective_df=detective_df, datasets_types_dict=datasets_types_dict)
+        list_dfs = header_analysis(files, n_jobs=n_jobs, detective_df=detective_df, datasets_types_dict=datasets_types_dict)
     pass
-    # make_xls_file(new_df)
+
+    final_df = pd.concat(list_dfs)
+
+    if with_excel:
+        make_xls_file(final_df)
