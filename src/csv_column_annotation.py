@@ -3,7 +3,7 @@ Reads CSVs in a folder and output a single file with all the column of said CSVs
 a column to annotate each column.
 
 Usage:
-    csv_header_annotation.py <i> [options]
+    csv_column_annotation.py <i> [options]
 
 Arguments:
     <i>                     An input folder with CSVs to analyze
@@ -104,12 +104,12 @@ def columns_extractor(file_path, detective_df=None, datasets_types_dict=None):
     return pd.DataFrame(new_df)
 
 
-def header_analysis(files_paths, n_jobs=2, detective_df=None, datasets_types_dict=None):
+def column_analysis(files_paths, n_jobs=2, detective_df=None, datasets_types_dict=None):
     Parallel(n_jobs=n_jobs)(
         delayed(columns_extractor)(path) for path in files_paths)
 
 
-def header_analysis_single(files_paths, detective_df=None, datasets_types_dict=None):
+def column_analysis_single(files_paths, detective_df=None, datasets_types_dict=None):
     df_list = []
     for i, f in enumerate(files_paths):
         df_list.append(columns_extractor(f, detective_df=detective_df, datasets_types_dict=datasets_types_dict))
@@ -139,9 +139,9 @@ if __name__ == '__main__':
     files = get_files(files_path)
 
     if n_jobs == 1:
-        list_dfs = header_analysis_single(files, detective_df=detective_df, datasets_types_dict=datasets_types_dict)
+        list_dfs = column_analysis_single(files, detective_df=detective_df, datasets_types_dict=datasets_types_dict)
     else:
-        list_dfs = header_analysis(files, n_jobs=n_jobs, detective_df=detective_df, datasets_types_dict=datasets_types_dict)
+        list_dfs = column_analysis(files, n_jobs=n_jobs, detective_df=detective_df, datasets_types_dict=datasets_types_dict)
     pass
 
     final_df = pd.concat(list_dfs)
